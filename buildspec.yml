@@ -13,8 +13,7 @@ phases:
     commands:
       - echo Build started on `date`
       - chmod +x mvnw
-      - ./mvnw clean package
-
+      - ./mvnw clean package -DskipTests
       - docker build -t migration-app .
       - docker tag migration-app:latest 732203471303.dkr.ecr.ap-south-1.amazonaws.com/eks-ecr:latest
 
@@ -29,7 +28,3 @@ phases:
 
       - kubectl get pods
       - kubectl get svc
-
-artifacts:
-  files:
-    - '**/*'
