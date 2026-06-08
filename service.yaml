@@ -4,8 +4,10 @@ metadata:
   name: migration-app-service
 spec:
   type: LoadBalancer
+
   selector:
     app: migration-app
+
   ports:
-  - port: 80
-    targetPort: 8080
+    - port: 80
+      targetPort: 8080
