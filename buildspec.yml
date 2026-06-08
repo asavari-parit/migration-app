@@ -19,20 +19,16 @@ phases:
       - docker tag migration-app:latest 732203471303.dkr.ecr.ap-south-1.amazonaws.com/eks-ecr:latest
 
   post_build:
-    commands:
-      - echo Pushing image to ECR...
-      - docker push 732203471303.dkr.ecr.ap-south-1.amazonaws.com/eks-ecr:latest
+  commands:
+    - echo Updating kubeconfig...
+    - aws eks update-kubeconfig --region ap-south-1 --name migration-cluster-1
 
-      - echo Updating kubeconfig...
-      - aws eks update-kubeconfig --region ap-south-1 --name migration-cluster-1
+    - echo Verifying cluster access...
+    - kubectl get nodes
 
-      - echo Deploying to EKS...
-      - kubectl apply -f deployment.yaml
-      - kubectl apply -f service.yaml
-
-      - echo Verifying deployment...
-      - kubectl get pods
-      - kubectl get svc
+    - echo Deploying to EKS...
+    - kubectl apply -f deployment.yaml
+    - kubectl apply -f service.yaml
 
 artifacts:
   files:
