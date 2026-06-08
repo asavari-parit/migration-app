@@ -6,25 +6,34 @@ phases:
       - echo Logging in to Amazon ECR...
       - aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 732203471303.dkr.ecr.ap-south-1.amazonaws.com
 
-      - echo Updating kubeconfig...
-      - aws eks update-kubeconfig --region ap-south-1 --name migration-cluster-1
-
   build:
     commands:
       - echo Build started on `date`
       - chmod +x mvnw
       - ./mvnw clean package -DskipTests
+
+      - echo Building Docker image...
       - docker build -t migration-app .
+
+      - echo Tagging Docker image...
       - docker tag migration-app:latest 732203471303.dkr.ecr.ap-south-1.amazonaws.com/eks-ecr:latest
 
   post_build:
     commands:
-      - echo Pushing image...
+      - echo Pushing image to ECR...
       - docker push 732203471303.dkr.ecr.ap-south-1.amazonaws.com/eks-ecr:latest
+
+      - echo Updating kubeconfig...
+      - aws eks update-kubeconfig --region ap-south-1 --name migration-cluster-1
 
       - echo Deploying to EKS...
       - kubectl apply -f deployment.yaml
       - kubectl apply -f service.yaml
 
+      - echo Verifying deployment...
       - kubectl get pods
       - kubectl get svc
+
+artifacts:
+  files:
+    - '**/*'
